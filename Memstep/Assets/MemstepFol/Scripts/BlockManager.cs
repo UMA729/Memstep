@@ -6,9 +6,9 @@ public class BlockManager : MonoBehaviour
 {
     [Header("ブロック設定")]
     public GameObject blockPrefab;
-    public int rows = 3;
-    public int columns = 3;
-    public float spacing = 2f;
+    public int rows = 3;//ブロック列
+    public int columns = 3;//ブロック行
+    public float spacing = 2f;//ブロックとブロックの間隔
 
     [Header("色設定")]
     public Color[] colorCandidates = new Color[6]
@@ -21,19 +21,20 @@ public class BlockManager : MonoBehaviour
         new Color(1f, 0.5f, 0f)  // オレンジ
     };
 
-    private List<GameObject> blocks = new List<GameObject>();
-    private Dictionary<GameObject, Color> originalColors = new Dictionary<GameObject, Color>();
+    private List<GameObject> blocks = new List<GameObject>();//色ブロックオブジェリスト
+    private Dictionary<GameObject, Color> originalColors = new Dictionary<GameObject, Color>();//色の保存
 
-    private Color correctColor;
-    private Color[] currentRoundColors; // 今回使う3色
-    public Color CorrectColor => correctColor;
+    private Color correctColor;//色の千tカウ
+    private Color[] currentRoundColors; //今回使う3色
+
+    public Color CorrectColor => correctColor;//色を決め反映させる配列
 
     void Start()
     {
-        CreateBlocks();
-        Choose3Colors();
-        SetRowColors();
-        ChooseCorrectColor();
+        CreateBlocks();//ブロック生成
+        Choose3Colors();//三色決定
+        ChooseCorrectColor();//
+        SetRowColors();//色をブロックへ
     }
 
     void CreateBlocks()
@@ -42,7 +43,7 @@ public class BlockManager : MonoBehaviour
         {
             for (int x = 0; x < columns; x++)
             {
-                Vector3 pos = new Vector3(x * spacing - spacing, (y * spacing) - (spacing), 0);
+                Vector3 pos = new Vector3(x * spacing - spacing, (y * spacing) - (spacing*1.5f), 0);
                 GameObject block = Instantiate(blockPrefab, pos, Quaternion.identity, transform);
                 blocks.Add(block);
             }
@@ -71,10 +72,33 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
-
     void ChooseCorrectColor()
     {
         correctColor = currentRoundColors[Random.Range(0, currentRoundColors.Length)];
+    }
+
+    public void SaveOriginalColors()
+    {
+        originalColors.Clear();
+        foreach (var block in blocks)
+        {
+            var sr = block.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                originalColors[block] = sr.color;
+            }
+        }
+    }
+
+    public void RestoreOriginalColors()
+    {
+        foreach (var kvp in originalColors)
+        {
+            if (kvp.Key != null)
+            {
+                kvp.Key.GetComponent<SpriteRenderer>().color = kvp.Value;
+            }
+        }
     }
 
     public bool CheckBlock(GameObject block)
