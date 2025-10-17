@@ -6,9 +6,9 @@ public class BlockManager : MonoBehaviour
 {
     [Header("ブロック設定")]
     public GameObject blockPrefab;
-    public int rows = 3;//ブロック列
-    public int columns = 3;//ブロック行
-    public float spacing = 2f;//ブロックとブロックの間隔
+    public int rows = 3;      // 横方向（行）
+    public int columns = 3;   // 縦方向（列）
+    public float spacing = 2f;
 
     [Header("色設定")]
     public Color[] colorCandidates = new Color[6]
@@ -21,29 +21,29 @@ public class BlockManager : MonoBehaviour
         new Color(1f, 0.5f, 0f)  // オレンジ
     };
 
-    private List<GameObject> blocks = new List<GameObject>();//色ブロックオブジェリスト
-    private Dictionary<GameObject, Color> originalColors = new Dictionary<GameObject, Color>();//色の保存
+    private List<GameObject> blocks = new List<GameObject>();
+    private Dictionary<GameObject, Color> originalColors = new Dictionary<GameObject, Color>();
 
-    private Color correctColor;//色の千tカウ
-    private Color[] currentRoundColors; //今回使う3色
+    private Color correctColor;
+    private Color[] currentRoundColors;
 
-    public Color CorrectColor => correctColor;//色を決め反映させる配列
+    public Color CorrectColor => correctColor;
 
     void Start()
     {
-        CreateBlocks();//ブロック生成
-        Choose3Colors();//三色決定
-        ChooseCorrectColor();//
-        SetRowColors();//色をブロックへ
+        CreateBlocks();
+        Choose3Colors();
+        SetRowColors();
+        ChooseCorrectColor();
     }
 
     void CreateBlocks()
     {
-        for (int y = 0; y < rows; y++)
+        for (int y = 0; y < rows; y++) // 縦方向
         {
-            for (int x = 0; x < columns; x++)
+            for (int x = 0; x < columns; x++) // 横方向
             {
-                Vector3 pos = new Vector3(x * spacing - spacing, (y * spacing) - (spacing*1.5f), 0);
+                Vector3 pos = new Vector3(x * spacing - spacing, (y * spacing) - spacing, 0);
                 GameObject block = Instantiate(blockPrefab, pos, Quaternion.identity, transform);
                 blocks.Add(block);
             }
@@ -63,15 +63,14 @@ public class BlockManager : MonoBehaviour
 
             for (int x = 0; x < columns; x++)
             {
-                int index = y * columns + x;
+                int index = y * columns + x; // ←ここがrowsベースに！
                 SpriteRenderer renderer = blocks[index].GetComponent<SpriteRenderer>();
                 renderer.color = shuffledColors[x];
-
-                // 元の色を保存
                 originalColors[blocks[index]] = shuffledColors[x];
             }
         }
     }
+
     void ChooseCorrectColor()
     {
         correctColor = currentRoundColors[Random.Range(0, currentRoundColors.Length)];
@@ -103,7 +102,6 @@ public class BlockManager : MonoBehaviour
 
     public bool CheckBlock(GameObject block)
     {
-        // 現在の色ではなく、保存された元の色で判定！
         if (originalColors.TryGetValue(block, out Color originalColor))
         {
             return originalColor == correctColor;
@@ -117,5 +115,4 @@ public class BlockManager : MonoBehaviour
     }
 
     public List<GameObject> GetAllBlocks() => blocks;
-
 }
