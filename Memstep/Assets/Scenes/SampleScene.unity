@@ -216,6 +216,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 369685256}
+  - component: {fileID: 369685257}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -238,6 +239,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &369685257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369685255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 480b9a0a6a3e8bb418d09b5d002d58b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstaclePrefab: {fileID: 6855367990296034188, guid: fb5b99b8d318d494790166aa22b9b67e, type: 3}
+  spawnInterval: 1.5
+  speed: 2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,6 +602,7 @@ MonoBehaviour:
   rows: 3
   columns: 3
   spacing: 2
+  shuffleSpeed: 3
   colorCandidates:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 0, b: 1, a: 1}
