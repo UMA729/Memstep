@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public class BlockManager : MonoBehaviour
     public int rows = 3;      // 横方向（行）
     public int columns = 3;   // 縦方向（列）
     public float spacing = 2f;
-
+    public float shuffleSpeed = 3f; // ←追加：シャッフル時の移動スピード
     [Header("色設定")]
     public Color[] colorCandidates = new Color[6]
     {
@@ -43,12 +44,46 @@ public class BlockManager : MonoBehaviour
         {
             for (int x = 0; x < columns; x++) // 横方向
             {
-                Vector3 pos = new Vector3(x * spacing - spacing, (y * spacing) - spacing, 0);
+                Vector3 pos = new Vector3(x * spacing - spacing, (y * spacing) - (spacing+1), 0);
                 GameObject block = Instantiate(blockPrefab, pos, Quaternion.identity, transform);
                 blocks.Add(block);
             }
         }
     }
+
+    //シャッフル
+    public void ShuffleRow(int rowIndex)
+    {
+        StartCoroutine(ShuffleRowAnimation(rowIndex));
+    }
+
+    public IEnumerator ShuffleRowAnimation(int rowIndex)
+    {
+        Debug.Log($"🌀 シャッフル開始 行={rowIndex}");
+
+        List<GameObject> rowBlocks = new List<GameObject>();
+        int startIndex = rowIndex * columns;
+        for (int i = 0; i < columns; i++)
+            rowBlocks.Add(blocks[startIndex + i]);
+
+        // 現在の色を取得
+        List<Color> colors = new List<Color>();
+        foreach (var block in rowBlocks)
+            colors.Add(block.GetComponent<SpriteRenderer>().color);
+
+        // シャッフル
+        var shuffled = colors.OrderBy(c => Random.value).ToList();
+
+        // 見た目にわかるように少し間を置いて変更
+        for (int i = 0; i < columns; i++)
+        {
+            rowBlocks[i].GetComponent<SpriteRenderer>().color = shuffled[i];
+            yield return new WaitForSeconds(0.2f); // ←アニメっぽく見える
+        }
+
+        Debug.Log($"✅ シャッフル完了 行={rowIndex}");
+    }
+
 
     void Choose3Colors()
     {
@@ -74,6 +109,27 @@ public class BlockManager : MonoBehaviour
     void ChooseCorrectColor()
     {
         correctColor = currentRoundColors[Random.Range(0, currentRoundColors.Length)];
+    }
+
+    public void ResetBlocks(int newRows)
+    {
+        // 既存ブロック削除
+        foreach (var block in blocks)
+            if (block != null)
+                Destroy(block);
+
+        StopAllCoroutines();
+
+
+        blocks.Clear();
+        originalColors.Clear();
+
+        // 行数を更新して再構築
+        rows = newRows;
+        CreateBlocks();
+        Choose3Colors();
+        SetRowColors();
+        ChooseCorrectColor();
     }
 
     public void SaveOriginalColors()
