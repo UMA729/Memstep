@@ -11,8 +11,9 @@ public class BlockManager : MonoBehaviour
     public int columns = 3;   // 縦方向（列）
     public float spacing = 2f;
     public float shuffleSpeed = 3f; // ←追加：シャッフル時の移動スピード
+
     [Header("色設定")]
-    public Color[] colorCandidates = new Color[6]
+    public Color[] color = new Color[6]
     {
         Color.red,
         Color.blue,
@@ -87,7 +88,7 @@ public class BlockManager : MonoBehaviour
 
     void Choose3Colors()
     {
-        currentRoundColors = colorCandidates.OrderBy(c => Random.value).Take(3).ToArray();
+        currentRoundColors = color.OrderBy(c => Random.value).Take(3).ToArray();
     }
 
     void SetRowColors()
@@ -98,7 +99,7 @@ public class BlockManager : MonoBehaviour
 
             for (int x = 0; x < columns; x++)
             {
-                int index = y * columns + x; // ←ここがrowsベースに！
+                int index = y * columns + x;
                 SpriteRenderer renderer = blocks[index].GetComponent<SpriteRenderer>();
                 renderer.color = shuffledColors[x];
                 originalColors[blocks[index]] = shuffledColors[x];

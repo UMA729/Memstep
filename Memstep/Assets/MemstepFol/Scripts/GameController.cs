@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     [Header("参照設定")]
     public BlockManager blockManager;   //ブロックマネージャー
     ColorObstacleManager COManager;
+    ScoreManager SCManager;
     public GameObject correctColorDisplay;   //色表示オブジェクト
     public int stage_count = 1;
 
@@ -24,6 +25,7 @@ public class GameController : MonoBehaviour
     {
         OriginPos = Hero.transform.position;
         COManager = FindAnyObjectByType<ColorObstacleManager>();
+        SCManager = FindAnyObjectByType<ScoreManager>();
         StartCoroutine(GameSequence());
     }
 
@@ -50,6 +52,12 @@ public class GameController : MonoBehaviour
         {
             StartCoroutine(COManager.SpawnLoop());
         }
+
+        if(stage_count == 5)
+        {
+
+        }
+
         // 行数を1増やして次のステージへ
         if (blockManager.rows < 4)
         {
@@ -122,11 +130,15 @@ public class GameController : MonoBehaviour
     //選択したブロックの処理
     void SelectBlock(int column)
     {
+        Debug.Log("入ってます");
+
         GameObject block = blockManager.GetBlockAt(currentRow, column);//選択されたブロックオブジェクト
 
         //正解の処理
         if (blockManager.CheckBlock(block))
         {
+            ScoreManager.Instance.AddScore(true);
+
             Debug.Log($"正解！列 {column + 1}");
             //主人公を選んだ場所のブロックに移動
             Hero.transform.position = block.transform.position;
@@ -135,6 +147,8 @@ public class GameController : MonoBehaviour
         //不正解の処理
         else
         {
+            ScoreManager.Instance.AddScore(false);
+
             Debug.Log($"不正解！列 {column + 1}");
             //主人公を選んだ場所のブロックに移動
             Hero.transform.position = block.transform.position;
@@ -144,9 +158,8 @@ public class GameController : MonoBehaviour
         if (currentRow >= blockManager.rows)
         {
             Debug.Log("ステージ終了");
-            canInput = false;
 
-           
+            canInput = false;
 
             isClear = true;
         }
@@ -182,7 +195,7 @@ public class GameController : MonoBehaviour
             {
                 // 色を保存しておく
                 Color original = sr.color;
-                sr.color = new Color(original.r * 0.1f, original.g * 0.1f, original.b * 0.1f);
+                sr.color = new Color(original.r * 0.01f, original.g * 0.01f, original.b * 0.01f);
             }
         }
     }
