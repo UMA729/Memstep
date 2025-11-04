@@ -1,12 +1,15 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
-using System.Collections;
 
 public class GameController : MonoBehaviour
 {
     [Header("参照設定")]
     public BlockManager blockManager;   //ブロックマネージャー
     ColorObstacleManager COManager;     //おじゃま色ブロック
+    ScoreManager SManager;
     PlayerController Pcon;              //プレイヤーコントローラー
 
     public GameObject correctColorDisplay;   //色表示オブジェクト
@@ -22,13 +25,37 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        string difficulty = PlayerPrefs.GetString("Difficulty", "Normal");
+
+        if (difficulty == "Normal")
+        {
+            blockManager.rows = 3;
+            blockManager.columns = 3;
+            blockManager.shuffleCount = 1;
+        }
+        else if (difficulty == "Hard")
+        {
+            blockManager.rows = 4;
+            blockManager.columns = 3;
+            blockManager.shuffleCount = 1;
+        }
+        else if(difficulty == "Exstra")
+        {
+            blockManager.rows = 5; 
+            blockManager.columns = 3;
+            blockManager.shuffleCount = 1;
+        }
+
         COManager = FindAnyObjectByType<ColorObstacleManager>();
         Pcon      = FindAnyObjectByType<PlayerController>();
         StartCoroutine(GameSequence());
     }
 
+
     IEnumerator NextStageSequence()
     {
+        stage_count++;
+
         //一秒待つ
         yield return new WaitForSeconds(0.1f);
         //プレイヤーをゴール位置に
@@ -51,19 +78,9 @@ public class GameController : MonoBehaviour
         blockManager.RestoreOriginalColors();
         yield return new WaitForSeconds(1f);
 
-        stage_count++;
 
-        // 行数を1増やして次のステージへ
-        if (blockManager.rows < 4)
-        {
-            int nextRows = blockManager.rows + 1;
-            Debug.Log($"🚀 次のステージへ！行数: {nextRows}");
-            blockManager.ResetBlocks(nextRows);
-        }
-        else
-        {
-            blockManager.ResetBlocks(blockManager.rows);
-        }
+        //ブロックを再構築
+        blockManager.ResetBlocks();
 
 
         // ステージ情報リセット
@@ -77,7 +94,6 @@ public class GameController : MonoBehaviour
     IEnumerator GameSequence()
     {
 
-        Pcon.InitializePos();
 
         canInput = false;
         stagenum.text = stage_count.ToString();
@@ -86,28 +102,25 @@ public class GameController : MonoBehaviour
         Debug.Log("記憶フェーズ開始");
         yield return new WaitForSeconds(memoryTime);
 
+        //ブロックを黒くする（暗転代わり）
+        Debug.Log("ブロックを暗転");
+        blockManager.SaveOriginalColors();
+       
 
         if (stage_count >= 3)
         {
             Debug.Log("シャッフル始まるよー");
             blockManager.ShuffleRow();
         }
-        if (stage_count == 4)
+        if (stage_count >= 4)
         {
             StartCoroutine(COManager.SpawnLoop());
         }
 
-        if (stage_count == 5)
-        {
-
-        }
+        DarkenBlocks();
 
         yield return new WaitForSeconds(1f);
 
-        //ブロックを黒くする（暗転代わり）
-        Debug.Log("ブロックを暗転");
-        blockManager.SaveOriginalColors();
-        DarkenBlocks();
 
         //正解色ディスプレイを更新（暗転後に残す）
         UpdateCorrectColorDisplay();
@@ -175,6 +188,12 @@ public class GameController : MonoBehaviour
 
             canInput = false;
 
+            if (stage_count == 5) // ★ 最終ステージ数
+            {
+                SceneManager.LoadScene("Clear");
+                return;
+            }
+
             StartCoroutine(NextStageSequence());
         }
     }
@@ -225,7 +244,7 @@ public class GameController : MonoBehaviour
         stage_count = 1;
 
         // ブロックを初期状態に戻す
-        blockManager.ResetBlocks(3);
+        blockManager.ResetBlocks();
 
         // プレイヤーを初期位置に戻す
         Pcon.Player.transform.position = OriginPos;

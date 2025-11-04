@@ -196,7 +196,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5445394391874803429, guid: 796f918f53442cc4b959dc9f29d94aba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -4
       objectReference: {fileID: 0}
     - target: {fileID: 5445394391874803429, guid: 796f918f53442cc4b959dc9f29d94aba, type: 3}
       propertyPath: m_LocalPosition.z
@@ -364,10 +364,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1600, y: 900}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -501,7 +501,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -343, y: 206}
+  m_AnchoredPosition: {x: -589, y: 316}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1208354885
@@ -526,7 +526,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 18
+    m_FontSize: 32
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 1
@@ -581,6 +581,7 @@ MonoBehaviour:
   Xspacing: 2
   Yspacing: 1.5
   shuffleSpeed: 3
+  shuffleCount: 0
   color:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 0, b: 1, a: 1}

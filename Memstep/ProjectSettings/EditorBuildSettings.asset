@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MemstepFol/Scenes/SampleScene.unity
+    path: Assets/MemstepFol/Scenes/TitleScene.unity
+    guid: 9995a85e0e4ca2747a65b05cfd9cbc67
+  - enabled: 1
+    path: Assets/MemstepFol/Scenes/DifLevelScene.unity
+    guid: 71f50a13aa14633458ae4f4f580b9e76
+  - enabled: 1
+    path: Assets/MemstepFol/Scenes/GameScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/MemstepFol/Scenes/Clear.unity
+    guid: c3b8f300e945c524db8ff9a518180b5e
   m_configObjects: {}

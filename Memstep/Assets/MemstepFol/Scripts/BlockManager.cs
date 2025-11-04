@@ -12,6 +12,7 @@ public class BlockManager : MonoBehaviour
     public float Xspacing = 2f;
     public float Yspacing = 1.5f;
     public float shuffleSpeed = 3f; // ←追加：シャッフル時の移動スピード
+    public int shuffleCount = 0;
 
     [Header("色設定")]
     public Color[] color = new Color[6]
@@ -90,49 +91,58 @@ public class BlockManager : MonoBehaviour
     //シャッフルするブロックの処理
     public IEnumerator ShuffleRowAnimation()
     {
-        int rowIndex = Random.Range(0, columns);
-
-        int startIndex = rowIndex * columns;
-
-        // 現在行のブロックを取得
-        List<GameObject> rowBlocks = new List<GameObject>();
-        for (int i = 0; i < columns; i++)
-            rowBlocks.Add(blocks[startIndex + i]);
-
-        // 現在の位置リストを保持
-        List<Vector3> originalPositions = rowBlocks.Select(b => b.transform.position).ToList();
-
-        // 並びをランダムに入れ替える
-        List<GameObject> shuffled = rowBlocks.OrderBy(b => Random.value).ToList();
-
-        float duration = 0.8f;
-        float height = 1.5f;
-
-        // ✅ 各ブロックのアニメーションをまとめて管理
-        List<Coroutine> moveCoroutines = new List<Coroutine>();
-
-        for (int i = 0; i < columns; i++)
+        for (int i = 0; i < shuffleCount; i++)
         {
-            GameObject block = shuffled[i];
-            Vector3 startPos = block.transform.position;
-            Vector3 endPos = originalPositions[i];
-            Coroutine move = StartCoroutine(MoveInArc(block, startPos, endPos, height, duration));
-            moveCoroutines.Add(move);
-            yield return new WaitForSeconds(0.1f); // 少しずつずらして動かす
-        }
+            int rowIndex = Random.Range(0, columns);
 
-        //全アニメーションが終わるまで待つ
-        yield return new WaitForSeconds(duration + 0.5f);
+            int startIndex = rowIndex * columns;
 
-        //全て動き終わってからリスト更新！
-        for (int i = 0; i < columns; i++)
-        {
-            blocks[startIndex + i] = shuffled[i];
+            // 現在行のブロックを取得
+            List<GameObject> rowBlocks = new List<GameObject>();
+            for (int j = 0; j < columns; j++)
+                rowBlocks.Add(blocks[startIndex + j]);
+
+            // 現在の位置リストを保持
+            List<Vector3> originalPositions = rowBlocks.Select(b => b.transform.position).ToList();
+
+            // 並びをランダムに入れ替える
+            List<GameObject> shuffled = rowBlocks.OrderBy(b => Random.value).ToList();
+
+            float duration = 0.8f;
+            float height = 1.5f;
+
+            // ✅ 各ブロックのアニメーションをまとめて管理
+            List<Coroutine> moveCoroutines = new List<Coroutine>();
+
+            for (int j = 0; j < columns; j++)
+            {
+                GameObject block = shuffled[j];
+                Vector3 startPos = block.transform.position;
+                Vector3 endPos = originalPositions[j];
+                Coroutine move = StartCoroutine(MoveInArc(block, startPos, endPos, height, duration));
+                moveCoroutines.Add(move);
+                yield return new WaitForSeconds(0.1f); // 少しずつずらして動かす
+            }
+
+            //全アニメーションが終わるまで待つ
+            yield return new WaitForSeconds(duration + 0.5f);
+
+            //全て動き終わってからリスト更新！
+            for (int j = 0; j < columns; j++)
+            {
+                blocks[startIndex + j] = shuffled[j];
+            }
+
+            if (shuffleCount > 1)
+            {
+                rowIndex = 0;
+                yield return new WaitForSeconds(1f);
+            }
         }
     }
 
-    //3色選択
-    void Choose3Colors()
+        //3色選択
+        void Choose3Colors()
     {
         currentRoundColors = color.OrderBy(c => Random.value).Take(3).ToArray();
     }
@@ -183,7 +193,7 @@ public class BlockManager : MonoBehaviour
     }
 
     //クリア後の現在のブロック情報
-    public void ResetBlocks(int newRows)
+    public void ResetBlocks()
     {
         // 既存ブロック削除
         foreach (var block in blocks)
@@ -197,7 +207,6 @@ public class BlockManager : MonoBehaviour
         originalColors.Clear();
 
         // 行数を更新して再構築
-        rows = newRows;
         CreateBlocks();
         Choose3Colors();
         SetRowColors();
